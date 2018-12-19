@@ -17,6 +17,10 @@
 #endif
 
 
+#ifndef _WIN32
+# include <dirent.h>
+#endif
+
 
 
 #ifdef ARYLEN
@@ -274,10 +278,100 @@ bool fileu_dirExist(const char* path)
 
 
 
-void fileu_getTmpDir(char* path)
+
+
+
+
+
+
+
+typedef struct fileu_Dir
 {
 #ifdef _WIN32
-    GetTempPathA(fileu_PATH_BUF_MAX, path);
+    WIN32_FIND_DATAA fdata;
+    HANDLE h;
+#else
+    DIR* h;
+#endif
+} fileu_Dir;
+
+
+
+fileu_Dir* fileu_openDir(const char* path)
+{
+#ifdef _WIN32
+    char dirPath[fileu_PATH_BUF_MAX] = "";
+    strncpy(dirPath, path, fileu_PATH_BUF_MAX);
+    u32 n = strnlen(path, fileu_PATH_BUF_MAX);
+    strncpy(dirPath + n, "/*", fileu_PATH_BUF_MAX - n);
+    WIN32_FIND_DATAA fdata;
+    HANDLE h = FindFirstFileA(dirPath, &fdata);
+    if (INVALID_HANDLE_VALUE == h)
+    {
+        return NULL;
+    }
+    fileu_Dir* dir = malloc(sizeof(*dir));
+    dir->fdata = fdata;
+    dir->h = h;
+    return dir;
+#else
+    DIR* h = opendir(path);
+    if (!h)
+    {
+        return NULL;
+    }
+    fileu_Dir* dir = malloc(sizeof(*dir));
+    dir->h = h;
+    return dir;
+#endif
+}
+
+
+void fileu_dirClose(fileu_Dir* dir)
+{
+#ifdef _WIN32
+    FindClose(dir->h);
+#else
+    closedir(dir->h);
+#endif
+    free(dir);
+}
+
+
+bool fileu_dirNextFile(fileu_Dir* dir, char* file)
+{
+#ifdef _WIN32
+    for (;;)
+    {
+        if (!FindNextFileA(dir->h, &dir->fdata))
+        {
+            return false;
+        }
+        if ((dir->fdata.cFileName[0] != '.') ||
+            (dir->fdata.cFileName[1] && (dir->fdata.cFileName[1] != '.')))
+        {
+            break;
+        }
+    }
+    strncpy(file, dir->fdata.cFileName, fileu_PATH_BUF_MAX);
+    return true;
+#else
+    struct dirent* entry = NULL;
+    for (;;)
+    {
+        entry = readdir(dir->h);
+        if (!entry)
+        {
+            return false;
+        }
+        if ((entry->d_name[0] != '.') ||
+            (entry->d_name[1] && (entry->d_name[1] != '.')))
+        {
+            break;
+        }
+    }
+    strncpy(file, entry->d_name, fileu_PATH_BUF_MAX);
+    return true;
 #endif
 }
 

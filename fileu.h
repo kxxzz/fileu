@@ -31,7 +31,6 @@ enum
 
 
 
-
 void fileu_getDirName(char* dir, const char* path, u32 tbufSize);
 void fileu_getLocalFileName(char* filename, const char* path, u32 tbufSize);
 void fileu_getBaseFileName(char* filename, const char* path, u32 tbufSize);
@@ -49,11 +48,13 @@ bool fileu_copyFile(const char* srcPath, const char* dstPath);
 bool fileu_fileExist(const char* path);
 bool fileu_dirExist(const char* path);
 
-void fileu_getTmpDir(char* path);
 
 
+typedef struct fileu_Dir fileu_Dir;
 
-
+fileu_Dir* fileu_openDir(const char* path);
+void fileu_dirClose(fileu_Dir* dir);
+bool fileu_dirNextFile(fileu_Dir* dir, char* file);
 
 
 
