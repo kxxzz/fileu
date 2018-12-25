@@ -21,6 +21,9 @@
 # include <dirent.h>
 #endif
 
+#ifdef __ANDROID__
+# include <unistd.h>
+#endif
 
 
 #ifdef ARYLEN
@@ -41,6 +44,20 @@
 
 
 
+static char* stzncpy(char* dst, char const* src, size_t len)
+{
+    assert(len > 0);
+    char* p = memccpy(dst, src, 0, len - 1);
+    if (p) --p;
+    else
+    {
+        p = dst + len - 1;
+        *p = 0;
+    }
+    return p;
+}
+
+
 
 
 
@@ -49,7 +66,7 @@ void fileu_getDirName(char* dir, const char* path, u32 tbufSize)
 {
     u32 len = (u32)strlen(path);
     len = min(len, tbufSize - 1);
-    strncpy(dir, path, len + 1);
+    stzncpy(dir, path, len + 1);
     for (char* p = dir + len - 1; p != dir; --p)
     {
         char c = *p;
@@ -70,11 +87,11 @@ void fileu_getLocalFileName(char* filename, const char* path, u32 tbufSize)
         char c = *p;
         if (('\\' == c) || ('/' == c))
         {
-            strncpy(filename, p + 1, len - (p - path));
+            stzncpy(filename, p + 1, len + 1 - (p - path));
             return;
         }
     }
-    strncpy(filename, path, len + 1);
+    stzncpy(filename, path, len + 1);
 }
 
 void fileu_getBaseFileName(char* filename, const char* path, u32 tbufSize)
@@ -87,12 +104,12 @@ void fileu_getBaseFileName(char* filename, const char* path, u32 tbufSize)
         char c = *p;
         if ('.' == c)
         {
-            strncpy(filename, path, p - path);
+            stzncpy(filename, path, p + 1 - path);
             filename[p - path] = 0;
             return;
         }
     }
-    strncpy(filename, path, len + 1);
+    stzncpy(filename, path, len + 1);
 }
 
 
@@ -301,9 +318,9 @@ fileu_Dir* fileu_openDir(const char* path)
 {
 #ifdef _WIN32
     char dirPath[fileu_PATH_BUF_MAX] = "";
-    strncpy(dirPath, path, fileu_PATH_BUF_MAX);
+    stzncpy(dirPath, path, fileu_PATH_BUF_MAX);
     u32 n = strnlen(path, fileu_PATH_BUF_MAX);
-    strncpy(dirPath + n, "/*", fileu_PATH_BUF_MAX - n);
+    stzncpy(dirPath + n, "/*", fileu_PATH_BUF_MAX - n);
     WIN32_FIND_DATAA fdata;
     HANDLE h = FindFirstFileA(dirPath, &fdata);
     if (INVALID_HANDLE_VALUE == h)
@@ -353,7 +370,7 @@ bool fileu_dirNextFile(fileu_Dir* dir, char* file)
             break;
         }
     }
-    strncpy(file, dir->fdata.cFileName, fileu_PATH_BUF_MAX);
+    stzncpy(file, dir->fdata.cFileName, fileu_PATH_BUF_MAX);
     return true;
 #else
     struct dirent* entry = NULL;
@@ -370,7 +387,7 @@ bool fileu_dirNextFile(fileu_Dir* dir, char* file)
             break;
         }
     }
-    strncpy(file, entry->d_name, fileu_PATH_BUF_MAX);
+    stzncpy(file, entry->d_name, fileu_PATH_BUF_MAX);
     return true;
 #endif
 }
