@@ -47,7 +47,7 @@
 static char* stzncpy(char* dst, char const* src, size_t len)
 {
     assert(len > 0);
-    char* p = memccpy(dst, src, 0, len - 1);
+    char* p = _memccpy(dst, src, 0, len - 1);
     if (p) --p;
     else
     {
@@ -319,7 +319,7 @@ fileu_Dir* fileu_openDir(const char* path)
 #ifdef _WIN32
     char dirPath[fileu_PATH_BUF_MAX] = "";
     stzncpy(dirPath, path, fileu_PATH_BUF_MAX);
-    u32 n = strnlen(path, fileu_PATH_BUF_MAX);
+    u32 n = (u32)strnlen(path, fileu_PATH_BUF_MAX);
     stzncpy(dirPath + n, "/*", fileu_PATH_BUF_MAX - n);
     WIN32_FIND_DATAA fdata;
     HANDLE h = FindFirstFileA(dirPath, &fdata);
