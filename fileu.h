@@ -26,35 +26,35 @@ typedef double f64;
 
 enum
 {
-    fileu_PATH_BUF_MAX = 260,
+    FILEU_PATH_BUF_MAX = 260,
 };
 
 
 
-void fileu_getDirName(char* dir, const char* path, u32 tbufSize);
-void fileu_getLocalFileName(char* filename, const char* path, u32 tbufSize);
-void fileu_getBaseFileName(char* filename, const char* path, u32 tbufSize);
+void FILEU_getDirName(char* dir, const char* path, u32 tbufSize);
+void FILEU_getLocalFileName(char* filename, const char* path, u32 tbufSize);
+void FILEU_getBaseFileName(char* filename, const char* path, u32 tbufSize);
 
-const char* fileu_filenameExt(const char* filename);
+const char* FILEU_filenameExt(const char* filename);
 
-int fileu_fwrite(FILE* f, const void* buf, u32 size);
-int fileu_fread(FILE* f, void* buf, u32 size);
+int FILEU_fwrite(FILE* f, const void* buf, u32 size);
+int FILEU_fread(FILE* f, void* buf, u32 size);
 
-u32 fileu_fileSize(FILE* f);
-u32 fileu_readFile(const char* path, char** buf);
-u32 fileu_writeFile(const char* path, u32 dataSize, const void* data);
-bool fileu_copyFile(const char* srcPath, const char* dstPath);
+u32 FILEU_fileSize(FILE* f);
+u32 FILEU_readFile(const char* path, char** buf);
+u32 FILEU_writeFile(const char* path, u32 dataSize, const void* data);
+bool FILEU_copyFile(const char* srcPath, const char* dstPath);
 
-bool fileu_fileExist(const char* path);
-bool fileu_dirExist(const char* path);
+bool FILEU_fileExist(const char* path);
+bool FILEU_dirExist(const char* path);
 
 
 
-typedef struct fileu_Dir fileu_Dir;
+typedef struct FILEU_Dir FILEU_Dir;
 
-fileu_Dir* fileu_openDir(const char* path);
-void fileu_dirClose(fileu_Dir* dir);
-bool fileu_dirNextFile(fileu_Dir* dir, char* file);
+FILEU_Dir* FILEU_openDir(const char* path);
+void FILEU_dirClose(FILEU_Dir* dir);
+bool FILEU_dirNextFile(FILEU_Dir* dir, char* file);
 
 
 

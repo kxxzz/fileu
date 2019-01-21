@@ -62,7 +62,7 @@ static char* stzncpy(char* dst, char const* src, size_t len)
 
 
 
-void fileu_getDirName(char* dir, const char* path, u32 tbufSize)
+void FILEU_getDirName(char* dir, const char* path, u32 tbufSize)
 {
     u32 len = (u32)strlen(path);
     len = min(len, tbufSize - 1);
@@ -78,7 +78,7 @@ void fileu_getDirName(char* dir, const char* path, u32 tbufSize)
     }
 }
 
-void fileu_getLocalFileName(char* filename, const char* path, u32 tbufSize)
+void FILEU_getLocalFileName(char* filename, const char* path, u32 tbufSize)
 {
     u32 len = (u32)strlen(path);
     len = min(len, tbufSize - 1);
@@ -94,7 +94,7 @@ void fileu_getLocalFileName(char* filename, const char* path, u32 tbufSize)
     stzncpy(filename, path, len + 1);
 }
 
-void fileu_getBaseFileName(char* filename, const char* path, u32 tbufSize)
+void FILEU_getBaseFileName(char* filename, const char* path, u32 tbufSize)
 {
     u32 len = (u32)strlen(path);
     assert(len > 0);
@@ -120,7 +120,7 @@ void fileu_getBaseFileName(char* filename, const char* path, u32 tbufSize)
 
 
 
-const char* fileu_filenameExt(const char* filename)
+const char* FILEU_filenameExt(const char* filename)
 {
     const char* dot = strrchr(filename, '.');
     if (!dot || dot == filename)
@@ -138,12 +138,12 @@ const char* fileu_filenameExt(const char* filename)
 
 
 
-int fileu_fwrite(FILE* f, const void* buf, u32 size)
+int FILEU_fwrite(FILE* f, const void* buf, u32 size)
 {
     return (int)fwrite(buf, 1, size, f);
 }
 
-int fileu_fread(FILE* f, void* buf, u32 size)
+int FILEU_fread(FILE* f, void* buf, u32 size)
 {
     return (int)fread(buf, 1, size, f);
 }
@@ -158,7 +158,7 @@ int fileu_fread(FILE* f, void* buf, u32 size)
 
 
 
-u32 fileu_fileSize(FILE* f)
+u32 FILEU_fileSize(FILE* f)
 {
     u32 pos = ftell(f);
     fseek(f, 0, SEEK_END);
@@ -167,14 +167,14 @@ u32 fileu_fileSize(FILE* f)
     return end;
 }
 
-u32 fileu_readFile(const char* path, char** buf)
+u32 FILEU_readFile(const char* path, char** buf)
 {
     FILE* f = fopen(path, "rb");
     if (!f)
     {
         return -1;
     }
-    u32 size = fileu_fileSize(f);
+    u32 size = FILEU_fileSize(f);
     if (-1 == size)
     {
         return -1;
@@ -201,7 +201,7 @@ u32 fileu_readFile(const char* path, char** buf)
 
 
 
-u32 fileu_writeFile(const char* path, u32 dataSize, const void* data)
+u32 FILEU_writeFile(const char* path, u32 dataSize, const void* data)
 {
     FILE* f = fopen(path, "w+b");
     if (!f)
@@ -228,16 +228,16 @@ u32 fileu_writeFile(const char* path, u32 dataSize, const void* data)
 
 
 
-bool fileu_copyFile(const char* srcPath, const char* dstPath)
+bool FILEU_copyFile(const char* srcPath, const char* dstPath)
 {
     int r;
     char* data = NULL;
-    r = fileu_readFile(srcPath, &data);
+    r = FILEU_readFile(srcPath, &data);
     if (-1 == r)
     {
         return false;
     }
-    r = fileu_writeFile(dstPath, r, data);
+    r = FILEU_writeFile(dstPath, r, data);
     if (-1 == r)
     {
         free(data);
@@ -258,7 +258,7 @@ bool fileu_copyFile(const char* srcPath, const char* dstPath)
 
 
 
-bool fileu_fileExist(const char* path)
+bool FILEU_fileExist(const char* path)
 {
 #ifdef _WIN32
     return _access(path, 0) != -1;
@@ -279,7 +279,7 @@ bool fileu_fileExist(const char* path)
 }
 
 
-bool fileu_dirExist(const char* path)
+bool FILEU_dirExist(const char* path)
 {
     struct stat st;
     return (stat(path, &st) == 0 && S_ISDIR(st.st_mode));
@@ -302,7 +302,7 @@ bool fileu_dirExist(const char* path)
 
 
 
-typedef struct fileu_Dir
+typedef struct FILEU_Dir
 {
 #ifdef _WIN32
     WIN32_FIND_DATAA fdata;
@@ -310,24 +310,24 @@ typedef struct fileu_Dir
 #else
     DIR* h;
 #endif
-} fileu_Dir;
+} FILEU_Dir;
 
 
 
-fileu_Dir* fileu_openDir(const char* path)
+FILEU_Dir* FILEU_openDir(const char* path)
 {
 #ifdef _WIN32
-    char dirPath[fileu_PATH_BUF_MAX] = "";
-    stzncpy(dirPath, path, fileu_PATH_BUF_MAX);
-    u32 n = (u32)strnlen(path, fileu_PATH_BUF_MAX);
-    stzncpy(dirPath + n, "/*", fileu_PATH_BUF_MAX - n);
+    char dirPath[FILEU_PATH_BUF_MAX] = "";
+    stzncpy(dirPath, path, FILEU_PATH_BUF_MAX);
+    u32 n = (u32)strnlen(path, FILEU_PATH_BUF_MAX);
+    stzncpy(dirPath + n, "/*", FILEU_PATH_BUF_MAX - n);
     WIN32_FIND_DATAA fdata;
     HANDLE h = FindFirstFileA(dirPath, &fdata);
     if (INVALID_HANDLE_VALUE == h)
     {
         return NULL;
     }
-    fileu_Dir* dir = malloc(sizeof(*dir));
+    FILEU_Dir* dir = malloc(sizeof(*dir));
     dir->fdata = fdata;
     dir->h = h;
     return dir;
@@ -337,14 +337,14 @@ fileu_Dir* fileu_openDir(const char* path)
     {
         return NULL;
     }
-    fileu_Dir* dir = malloc(sizeof(*dir));
+    FILEU_Dir* dir = malloc(sizeof(*dir));
     dir->h = h;
     return dir;
 #endif
 }
 
 
-void fileu_dirClose(fileu_Dir* dir)
+void FILEU_dirClose(FILEU_Dir* dir)
 {
 #ifdef _WIN32
     FindClose(dir->h);
@@ -355,7 +355,7 @@ void fileu_dirClose(fileu_Dir* dir)
 }
 
 
-bool fileu_dirNextFile(fileu_Dir* dir, char* file)
+bool FILEU_dirNextFile(FILEU_Dir* dir, char* file)
 {
 #ifdef _WIN32
     for (;;)
@@ -370,7 +370,7 @@ bool fileu_dirNextFile(fileu_Dir* dir, char* file)
             break;
         }
     }
-    stzncpy(file, dir->fdata.cFileName, fileu_PATH_BUF_MAX);
+    stzncpy(file, dir->fdata.cFileName, FILEU_PATH_BUF_MAX);
     return true;
 #else
     struct dirent* entry = NULL;
@@ -387,7 +387,7 @@ bool fileu_dirNextFile(fileu_Dir* dir, char* file)
             break;
         }
     }
-    stzncpy(file, entry->d_name, fileu_PATH_BUF_MAX);
+    stzncpy(file, entry->d_name, FILEU_PATH_BUF_MAX);
     return true;
 #endif
 }
