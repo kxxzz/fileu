@@ -285,8 +285,8 @@ bool FILEU_fileExist(const char* path)
 
 bool FILEU_dirExist(const char* path)
 {
-    struct stat st;
-    return (stat(path, &st) == 0 && S_ISDIR(st.st_mode));
+    struct stat st[1];
+    return (stat(path, st) == 0 && S_ISDIR(st->st_mode));
 }
 
 
@@ -309,7 +309,7 @@ bool FILEU_dirExist(const char* path)
 typedef struct FILEU_Dir
 {
 #ifdef _WIN32
-    WIN32_FIND_DATAA fdata;
+    WIN32_FIND_DATAA fdata[1];
     HANDLE h;
 #else
     DIR* h;
@@ -325,14 +325,14 @@ FILEU_Dir* FILEU_openDir(const char* path)
     stzncpy(dirPath, path, FILEU_PATH_BUF_MAX);
     u32 n = (u32)strnlen(path, FILEU_PATH_BUF_MAX);
     stzncpy(dirPath + n, "/*", FILEU_PATH_BUF_MAX - n);
-    WIN32_FIND_DATAA fdata;
-    HANDLE h = FindFirstFileA(dirPath, &fdata);
+    WIN32_FIND_DATAA fdata[1];
+    HANDLE h = FindFirstFileA(dirPath, fdata);
     if (INVALID_HANDLE_VALUE == h)
     {
         return NULL;
     }
     FILEU_Dir* dir = malloc(sizeof(*dir));
-    dir->fdata = fdata;
+    dir->fdata[0] = fdata[0];
     dir->h = h;
     return dir;
 #else
@@ -364,17 +364,17 @@ bool FILEU_dirNextFile(FILEU_Dir* dir, char* file)
 #ifdef _WIN32
     for (;;)
     {
-        if (!FindNextFileA(dir->h, &dir->fdata))
+        if (!FindNextFileA(dir->h, dir->fdata))
         {
             return false;
         }
-        if ((dir->fdata.cFileName[0] != '.') ||
-            (dir->fdata.cFileName[1] && (dir->fdata.cFileName[1] != '.')))
+        if ((dir->fdata->cFileName[0] != '.') ||
+            (dir->fdata->cFileName[1] && (dir->fdata->cFileName[1] != '.')))
         {
             break;
         }
     }
-    stzncpy(file, dir->fdata.cFileName, FILEU_PATH_BUF_MAX);
+    stzncpy(file, dir->fdata->cFileName, FILEU_PATH_BUF_MAX);
     return true;
 #else
     struct dirent* entry = NULL;
