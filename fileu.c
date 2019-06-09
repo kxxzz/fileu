@@ -181,10 +181,12 @@ u32 FILEU_readFile(const char* path, char** buf)
     u32 size = FILEU_fileSize(f);
     if (-1 == size)
     {
+        fclose(f);
         return -1;
     }
     if (0 == size)
     {
+        fclose(f);
         return 0;
     }
     *buf = (char*)malloc(size + 1);
