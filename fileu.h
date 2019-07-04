@@ -41,8 +41,8 @@ int FILEU_fwrite(FILE* f, const void* buf, u32 size);
 int FILEU_fread(FILE* f, void* buf, u32 size);
 
 u32 FILEU_fileSize(FILE* f);
-u32 FILEU_readFile(const char* path, char** buf);
-u32 FILEU_writeFile(const char* path, u32 dataSize, const void* data);
+u32 FILEU_readFile(const char* path, char* buf, u32 bufSize);
+u32 FILEU_writeFile(const char* path, const void* data, u32 dataSize);
 bool FILEU_copyFile(const char* srcPath, const char* dstPath);
 
 bool FILEU_fileExist(const char* path);

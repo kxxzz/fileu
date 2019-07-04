@@ -171,7 +171,7 @@ u32 FILEU_fileSize(FILE* f)
     return end;
 }
 
-u32 FILEU_readFile(const char* path, char** buf)
+u32 FILEU_readFile(const char* path, char* buf, u32 bufSize)
 {
     FILE* f = fopen(path, "rb");
     if (!f)
@@ -184,18 +184,18 @@ u32 FILEU_readFile(const char* path, char** buf)
         fclose(f);
         return -1;
     }
-    *buf = (char*)malloc(size + 1);
-    // end c string
-    (*buf)[size] = 0;
+    if (!buf || !bufSize || (bufSize < size + 1))
+    {
+        return size;
+    }
+    buf[size] = 0;
     if (size > 0)
     {
-        size_t r = fread(*buf, 1, size, f);
-        if (r != (size_t)size)
+        u32 r = (u32)fread(buf, 1, size, f);
+        if (r != size)
         {
-            free(*buf);
-            *buf = NULL;
             fclose(f);
-            return -1;
+            return r;
         }
     }
     fclose(f);
@@ -205,7 +205,7 @@ u32 FILEU_readFile(const char* path, char** buf)
 
 
 
-u32 FILEU_writeFile(const char* path, u32 dataSize, const void* data)
+u32 FILEU_writeFile(const char* path, const void* data, u32 dataSize)
 {
     FILE* f = fopen(path, "w+b");
     if (!f)
@@ -234,15 +234,22 @@ u32 FILEU_writeFile(const char* path, u32 dataSize, const void* data)
 
 bool FILEU_copyFile(const char* srcPath, const char* dstPath)
 {
-    int r;
+    int n;
     char* data = NULL;
-    r = FILEU_readFile(srcPath, &data);
-    if (-1 == r)
+    n = FILEU_readFile(srcPath, NULL, 0);
+    if (-1 == n)
     {
         return false;
     }
-    r = FILEU_writeFile(dstPath, r, data);
-    if (-1 == r)
+    data = malloc(n);
+    n = FILEU_readFile(srcPath, data, n);
+    if (-1 == n)
+    {
+        free(data);
+        return false;
+    }
+    n = FILEU_writeFile(dstPath, data, n);
+    if (-1 == n)
     {
         free(data);
         return false;
