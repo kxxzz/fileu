@@ -184,21 +184,19 @@ u32 FILEU_readFile(const char* path, char** buf)
         fclose(f);
         return -1;
     }
-    if (0 == size)
-    {
-        fclose(f);
-        return 0;
-    }
     *buf = (char*)malloc(size + 1);
     // end c string
     (*buf)[size] = 0;
-    size_t r = fread(*buf, 1, size, f);
-    if (r != (size_t)size)
+    if (size > 0)
     {
-        free(*buf);
-        *buf = NULL;
-        fclose(f);
-        return -1;
+        size_t r = fread(*buf, 1, size, f);
+        if (r != (size_t)size)
+        {
+            free(*buf);
+            *buf = NULL;
+            fclose(f);
+            return -1;
+        }
     }
     fclose(f);
     return size;
