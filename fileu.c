@@ -184,11 +184,10 @@ u32 FILEU_readFile(const char* path, char* buf, u32 bufSize)
         fclose(f);
         return -1;
     }
-    if (!buf || !bufSize || (bufSize < size + 1))
+    if (!buf || !bufSize || (bufSize < size))
     {
         return size;
     }
-    buf[size] = 0;
     if (size > 0)
     {
         u32 r = (u32)fread(buf, 1, size, f);
