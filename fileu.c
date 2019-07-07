@@ -271,7 +271,8 @@ bool FILEU_copyFile(const char* srcPath, const char* dstPath)
 bool FILEU_fileExist(const char* path)
 {
 #ifdef _WIN32
-    return _access(path, 0) != -1;
+    struct stat buffer;
+    return 0 == stat(path, &buffer);
 #elif defined(__EMSCRIPTEN__)
     FILE* f = fopen(path, "r");
     if (!f)
