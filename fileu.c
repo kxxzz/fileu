@@ -186,6 +186,7 @@ u32 FILEU_readFile(const char* path, char* buf, u32 bufSize)
     }
     if (!buf || !bufSize || (bufSize < size))
     {
+        fclose(f);
         return size;
     }
     if (size > 0)
