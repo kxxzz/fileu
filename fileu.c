@@ -285,7 +285,7 @@ const char* FILEU_fileMmap(const char* filename, size_t* pLen)
     if (file == INVALID_HANDLE_VALUE)
     {
         DWORD err = GetLastError();
-        perror("CreateFileA");
+        fprintf(stderr, "CreateFileA failed, error=%d", err);
         return NULL;
     }
     HANDLE fileMapping = CreateFileMapping(file, NULL, PAGE_READONLY, 0, 0, NULL);
@@ -293,7 +293,7 @@ const char* FILEU_fileMmap(const char* filename, size_t* pLen)
     {
         DWORD err = GetLastError();
         CloseHandle(file);
-        perror("CreateFileMapping");
+        fprintf(stderr, "CreateFileMapping failed, error=%d", err);
         return NULL;
     }
     LPVOID fileMapView = MapViewOfFile(fileMapping, FILE_MAP_READ, 0, 0, 0);
@@ -302,7 +302,7 @@ const char* FILEU_fileMmap(const char* filename, size_t* pLen)
         DWORD err = GetLastError();
         CloseHandle(fileMapping);
         CloseHandle(file);
-        perror("MapViewOfFile");
+        fprintf(stderr, "MapViewOfFile failed, error=%d", err);
         return NULL;
     }
     return fileMapView;
