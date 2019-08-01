@@ -66,10 +66,10 @@ static char* stzncpy(char* dst, char const* src, size_t len)
 
 
 
-void FILEU_getDirName(char* dir, const char* path, u32 tbufSize)
+void FILEU_getDirName(char* dir, const char* path)
 {
     u32 len = (u32)strlen(path);
-    len = min(len, tbufSize - 1);
+    len = min(len, FILEU_PATH_BUF_MAX - 1);
     stzncpy(dir, path, len + 1);
     for (char* p = dir + len - 1; p != dir; --p)
     {
@@ -82,10 +82,10 @@ void FILEU_getDirName(char* dir, const char* path, u32 tbufSize)
     }
 }
 
-void FILEU_getLocalFileName(char* filename, const char* path, u32 tbufSize)
+void FILEU_getLocalFileName(char* filename, const char* path)
 {
     u32 len = (u32)strlen(path);
-    len = min(len, tbufSize - 1);
+    len = min(len, FILEU_PATH_BUF_MAX - 1);
     for (const char* p = path + len - 1; p != path; --p)
     {
         char c = *p;
@@ -98,11 +98,11 @@ void FILEU_getLocalFileName(char* filename, const char* path, u32 tbufSize)
     stzncpy(filename, path, len + 1);
 }
 
-void FILEU_getBaseFileName(char* filename, const char* path, u32 tbufSize)
+void FILEU_getBaseFileName(char* filename, const char* path)
 {
     u32 len = (u32)strlen(path);
     assert(len > 0);
-    len = min(len, tbufSize - 1);
+    len = min(len, FILEU_PATH_BUF_MAX - 1);
     for (const char* p = path + len - 1; p != path; --p)
     {
         char c = *p;

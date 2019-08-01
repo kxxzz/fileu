@@ -31,9 +31,9 @@ enum
 
 
 
-void FILEU_getDirName(char* dir, const char* path, u32 tbufSize);
-void FILEU_getLocalFileName(char* filename, const char* path, u32 tbufSize);
-void FILEU_getBaseFileName(char* filename, const char* path, u32 tbufSize);
+void FILEU_getDirName(char* dir, const char* path);
+void FILEU_getLocalFileName(char* filename, const char* path);
+void FILEU_getBaseFileName(char* filename, const char* path);
 
 const char* FILEU_filenameExt(const char* filename);
 
