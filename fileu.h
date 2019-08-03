@@ -26,7 +26,7 @@ typedef double f64;
 
 enum
 {
-    FILEU_PATH_BUF_MAX = 260,
+    FILEU_PATH_BUF_MAX = 2048,
 };
 
 

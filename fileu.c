@@ -52,7 +52,10 @@ static char* stzncpy(char* dst, char const* src, size_t len)
 #else
     char* p = memccpy(dst, src, 0, len - 1);
 #endif
-    if (p) --p;
+    if (p)
+    {
+        --p;
+    }
     else
     {
         p = dst + len - 1;
