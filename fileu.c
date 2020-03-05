@@ -174,7 +174,7 @@ u32 FILEU_fileSize(FILE* f)
     return end;
 }
 
-u32 FILEU_readFile(const char* path, char* buf, u32 bufSize)
+u32 FILEU_readFile(const char* path, void* buf, u32 bufSize)
 {
     FILE* f = fopen(path, "rb");
     if (!f)
